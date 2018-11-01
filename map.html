@@ -1,0 +1,98 @@
+
+<html>
+  <head>
+
+    <title>Выборы</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+	  <link rel = "stylesheet"  href = "https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+
+	  <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+	  <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+	  <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+    <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+    <script src = "https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+  	<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>      
+
+	  <script src="myData.js"></script>
+	  <script src="mapJs.js"></script>      
+	  <script src="mapController.js"></script>
+    <link rel="stylesheet" type="text/css" href="mapStyles.css">
+
+  </head>
+
+    <body>
+
+      <div ng-app = "myApp" ng-controller = "myController" layout="column" id="mainBlock">
+
+        <div layout="column" class="blocks">
+          <div id="map" style="width: 100%; height: 300px">
+          </div>
+
+          <div layout="row" layout-xs="column">
+            <md-button flex = "33" flex-xs="10" flex-order-xs="3" class="md-primary md-raised" ng-click="NgGeolocationSearch()">Определить по GPS</md-button>
+            <input  flex = "33" flex-xs="10" flex-order-xs="1" id="input1" type="text" ng-model = "searchData" placeholder="Введите название округа">
+            <md-button  flex = "33" flex-xs="10" flex-order-xs="2" class="md-primary md-raised" ng-click="NgManualSearch(searchData)">Найти вручную</md-button>
+          </div>
+        </div>
+
+        <div style="display:{{errorVisibleBox}};" id="errorMessageBox" class="blocks">
+          {{errorMessage}}
+        </div>
+
+        <div style="display:{{visibleBox}};" flex  layout="column" class="blocks" id="chosenRegion">
+          <div flex>Выбранный регион: <span style="color:green; font-size:30px;">{{adminArea}}</span></div>
+          <div flex><span style="color:magenta;">{{warningMessage}}</span></div>
+        </div>
+
+          <div style="display:{{visibleBox}};" flex layout="column" class="blocks">
+            <div flex class="header">
+              Выбор по округу<br>(необходимо выбрать не более одного кандидата)
+            </div>
+            <div flex class="table">
+              <table>
+               <tr><th>Выбрать</th><th>Фото</th><th>Имя</th><th>Дата<br>рождения</th><th>Субъект<br>выдвижения</th><th>Место<br>работы</th><th>Программа</th></tr>
+               <tr ng-repeat="x in myObject.districts[distNum].condidatesList1">
+                 <td><input type="radio" id="test{{$index}}" name="radio1" ng-click ="displayChoise1(x.conNames)"><label for="test{{$index}}" ></label></td><td><img class="avatar" src="{{x.conPhoto}}" alt=""></td><td>{{x.conNames.firstN}}<br>{{x.conNames.secondN}}<br>{{x.conNames.thirdN}}<br></td><td>{{x.conBirthDate}}</td><td>{{x.conActivity}}</td><td>{{x.conJob}}</td><td><a href="{{x.conPDF}}" ><button class="linkToPDF">PDF</button></a></td>
+               </tr>
+              </table>
+            </div>
+          </div>
+
+          <div style="display:{{visibleBox}};" flex layout="column" class="blocks">
+            <div flex class="header">
+              Выбор по списку<br>(необходимо выбрать не более пяти кандидатов, но не менее одного)
+            </div>
+            <div flex class="table">
+              <table>
+                <tr><th>Выбрать</th><th>Фото</th><th>Имя</th><th>Дата<br>рождения</th><th>Субъект<br>выдвижения</th><th>Место<br>работы</th><th>Программа</th></tr>
+                <tr ng-repeat="x in myObject.districts[distNum].condidatesList2">
+                  <td><input type="checkbox" id="test1{{$index}}" ng-model="checkboxVal[$index]" ng-click="displayChoise2($index,x.conNames)"><label for="test1{{$index}}"></label></td></td><td><img class="avatar" src="{{x.conPhoto}}" alt=""></td><td>{{x.conNames.firstN}}<br>{{x.conNames.secondN}}<br>{{x.conNames.thirdN}}<br></td><td>{{x.conBirthDate}}</td><td>{{x.conActivity}}</td><td>{{x.conJob}}</td><td><a href="{{x.conPDF}}" ><button class="linkToPDF">PDF</button></a></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+        <div flex layout="column" style="display:{{visibleBox}};" class="blocks">
+       		<div flex class="header">
+       	 		Ваш выбор по ОКРУГУ:<br>
+        		{{choise1.firstN}} {{choise1.secondN}} {{choise1.thirdN}}        	
+        	</div>
+
+        	<div flex layout="column" class="header">
+        		Ваш выбор по СПИСКУ:<br>
+        		<div flex style="display:{{choise2Visibility[0]}};">{{choise2[0].firstN}} {{choise2[0].secondN}} {{choise2[0].thirdN}}<br></div>    
+        		<div flex style="display:{{choise2Visibility[1]}};">{{choise2[1].firstN}} {{choise2[1].secondN}} {{choise2[1].thirdN}}<br></div>    
+        		<div flex style="display:{{choise2Visibility[2]}};">{{choise2[2].firstN}} {{choise2[2].secondN}} {{choise2[2].thirdN}}<br></div>    
+        		<div flex style="display:{{choise2Visibility[3]}};">{{choise2[3].firstN}} {{choise2[3].secondN}} {{choise2[3].thirdN}}<br></div>    
+        		<div flex style="display:{{choise2Visibility[4]}};">{{choise2[4].firstN}} {{choise2[4].secondN}} {{choise2[4].thirdN}}<br></div>    
+            <div flex> <span style="color:red;">{{confirmChoiseError}}</span></div>
+            <div flex><md-button  class="md-primary md-raised" ng-click="confirmChoise()">Подтвердить выбор</md-button></div>
+        	</div>
+        </div>
+
+      </div>
+    </body>
+</html>
